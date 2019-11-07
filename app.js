@@ -6,38 +6,39 @@ or in the "license" file accompanying this file. This file is distributed on an 
 See the License for the specific language governing permissions and limitations under the License.
 */
 
-
-
-
 var express = require('express')
 var bodyParser = require('body-parser')
 var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
 // Stripe parameters
-const stripe = require('stripe')('sk_test_*************');
-const endpointSecret = 'whsec_*********************';
+const stripe = require('stripe')('sk_test_************');
+const endpointSecret = 'whsec_************';
 
 // declare a new express app
 var app = express()
-app.use(bodyParser.json())
+//app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
   next()
 });
 
+app.use(bodyParser.json({
+  verify: function (req, res, buf) {
+    req.rawBody = buf.toString()
+  }
+}));
 
-// Match the raw body to content type application/json
-app.post('/webhook', bodyParser.raw({type: 'application/json'}), (request, response) => {
+app.post('/webhook', function (request, response) {
   const sig = request.headers['stripe-signature'];
-
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret);
+    console.log(event);
   }
   catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
@@ -54,7 +55,7 @@ app.post('/webhook', bodyParser.raw({type: 'application/json'}), (request, respo
   }
 
   // Return a response to acknowledge receipt of the event
-  response.json({received: true});
+  response.json({ received: true });
 });
 
 app.listen(4242, () => console.log('Running on port 4242'));
