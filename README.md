@@ -27,3 +27,12 @@ amplify push
 ### Create a webhook in Stripe
 Stripe Dashboard -> Developers -> webhooks
 Add a webhook with the endpoint and the event trigger
+
+### Update the app.js
+Copy the app.js in this repo. Replace the secret key and the webhook secret.
+push
+```
+amplify push
+```
+
+Done! You can now use add your specific code in the app.js
