@@ -30,6 +30,11 @@ Add a webhook with the endpoint and the event trigger
 
 ### Update the app.js
 Copy the app.js in this repo. Replace the secret key and the webhook secret.
+In the function folder, install stripe:
+```
+npm install stripe
+```
+
 push
 ```
 amplify push
